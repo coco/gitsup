@@ -1,3 +1,5 @@
+Votes = new Mongo.Collection("votes")
+
 if (Meteor.isClient) {
     var parser = document.createElement('a')
     parser.href = document.location.href
