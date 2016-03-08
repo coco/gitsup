@@ -19,7 +19,7 @@ if (Meteor.isClient) {
                 '<li>'+
                   '<h3>'+
                     '<a href="#'+data[i].number+'"><img src="/vote.gif" alt="Vote" /></a> '+
-                    '<a href="{{html_url}}">'+data[i].title+'</a> '+
+                    '<a href="'+data[i].html_url+'">'+data[i].title+'</a> '+
                     '<span>(<a href="'+data[i].html_url+'">#'+data[i].number+'</a>)</span>'+
                   '</h3>'+
                   '<p>'+
