@@ -9,11 +9,16 @@ if (Meteor.isClient) {
 
     $(function() {
 
+        if(typeof path[3] == 'undefined') {
+            return;
+        }
+
         $('h2').html(username+'/'+repository+'/'+listType)
         $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
 
         $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
             console.log(data)
+            $('ol').empty()
             for (i = 0; i < data.length; i++) {
               $('ol').append(
                 '<li>'+
