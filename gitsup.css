@@ -1,1 +1,21 @@
 /* CSS declarations go here */
+body {
+  margin: 0;
+  background: #f6f6ef;
+  color: #1d1d1d;
+}
+header {
+  background: #ff6600;
+  overflow: hidden;
+}
+header h2 {
+  margin: 10px;
+}
+header h2 a,
+header h2 a:visited {
+  color: #1d1d1d;
+}
+ol {
+  overflow: hidden;
+  margin: 0;
+}

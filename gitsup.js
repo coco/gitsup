@@ -13,8 +13,8 @@ if (Meteor.isClient) {
             return;
         }
 
-        $('h2').html(username+'/'+repository+'/'+listType)
         $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
+        $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
 
         $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
             console.log(data)
