@@ -1,19 +1,42 @@
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+    var parser = document.createElement('a')
+    parser.href = document.location.href
+    var path = parser.pathname.split('/')
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
-    }
-  });
+    var username = path[1]
+    var repository = path[2]
+    var listType = path[3]
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
+    $(function() {
+
+        $('h2').html(username+'/'+repository+'/'+listType)
+        $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
+
+        $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
+            console.log(data)
+            for (i = 0; i < data.length; i++) {
+              $('ol').append(
+                '<li>'+
+                  '<h3>'+
+                    '<a href="#'+data[i].number+'"><img src="/vote.gif" alt="Vote" /></a> '+
+                    '<a href="{{html_url}}">'+data[i].title+'</a> '+
+                    '<span>(<a href="'+data[i].html_url+'">#'+data[i].number+'</a>)</span>'+
+                  '</h3>'+
+                  '<p>'+
+                    '<span>'+
+                      '3 points by'+
+                    '</span> '+
+                    '<a href="'+data[i].user.html_url+'">'+data[i].user.login+'</a> '+
+                    '<span>'+
+                      '2 hours ago |'+
+                    '</span> '+
+                    '<a href="'+data[i].comments_url+'">'+data[i].comments+' comments</a>'+
+                  '</p>'+
+                '</li>'
+              )
+            }
+        })
+    })
 }
 
 if (Meteor.isServer) {
@@ -21,3 +44,5 @@ if (Meteor.isServer) {
     // code to run on server at startup
   });
 }
+
+
