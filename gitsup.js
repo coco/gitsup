@@ -1,6 +1,9 @@
 Votes = new Mongo.Collection("votes")
 
 if (Meteor.isClient) {
+
+    console.log(Votes.find({}).fetch())
+
     var parser = document.createElement('a')
     parser.href = document.location.href
     var path = parser.pathname.split('/')
