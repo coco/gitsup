@@ -1,5 +1,16 @@
 Votes = new Mongo.Collection("votes")
 
+Meteor.methods({
+  addVote: function (vote) {
+    // Make sure the user is logged in before inserting a task
+    if (! Meteor.userId()) {
+      throw new Meteor.Error("not-authorized");
+    }
+
+    Vote.insert(vote);
+  }
+});
+
 if (Meteor.isClient) {
 
     var parser = document.createElement('a')
@@ -49,7 +60,7 @@ if (Meteor.isClient) {
                       )
                       $($('ol li .vote')[i]).click(function(e){
                           var issueId = $(e.currentTarget).data('issueId')
-                          Votes.insert({repoId:repoId, issueId:issueId})
+                          Meteor.call("addVote", {repoId:repoId, issueId:issueId})
                           console.log(repoId, issueId)
                           return false
                       })
