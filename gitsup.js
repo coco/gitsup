@@ -43,7 +43,7 @@ if (Meteor.isClient) {
                             '<span>'+
                               '2 hours ago |'+
                             '</span> '+
-                            '<a href="'+data[i].comments_url+'">'+data[i].comments+' comments</a>'+
+                            '<a href="'+data[i].html_url+'">'+data[i].comments+' comments</a>'+
                           '</p>'+
                         '</li>'
                       )
