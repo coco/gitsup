@@ -2,7 +2,10 @@ Votes = new Mongo.Collection("votes")
 
 if (Meteor.isClient) {
 
-    console.log(Votes.find({}).fetch())
+    // A hack to know when it's ready to get data
+    Meteor.subscribe('default_db_data', function(){
+        console.log(Votes.find({}).fetch())
+    })
 
     var parser = document.createElement('a')
     parser.href = document.location.href
@@ -51,7 +54,10 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    // code to run on server at startup
+    // A hack to know when it's ready to get data
+    Meteor.publish('default_db_data', function(){
+        return Votes.find({},{limit:1})
+    })
   });
 }
 
