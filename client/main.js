@@ -20,14 +20,25 @@ $(function() {
         var repoId;
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
-            var tallys = Tallys.find({repoId:repoId}).fetch()
+            var tally = Tallys.find({repoId:repoId}).fetch()[0]
 
-            console.log(tallys)
+            console.log(tally)
 
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
                 $('ol').empty()
                 for (i = 0; i < data.length; i++) {
-                  var votes = Votes.find({issueId:data[i].id}).fetch().length
+
+                  var votes
+                  if (typeof tally == 'undefined') {
+                    votes = 0
+                  } else {
+                    if(typeof tally.issues[data[i].id] == 'undefined') {
+                        votes = 0
+                    } else {
+                        votes = tally.issues[data[i].id]
+                    }
+                  }
+
                   $('ol').append(
                     '<li>'+
                       '<h3>'+
