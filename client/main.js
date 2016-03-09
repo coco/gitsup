@@ -20,6 +20,10 @@ $(function() {
         var repoId;
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
+            var tallys = Tallys.find({repoId:repoId}).fetch()
+
+            console.log(tallys)
+
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
                 $('ol').empty()
                 for (i = 0; i < data.length; i++) {
