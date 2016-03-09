@@ -5,6 +5,6 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized");
     }
 
-    Vote.insert(vote);
+    Votes.insert(vote);
   }
 });
