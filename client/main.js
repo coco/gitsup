@@ -36,11 +36,11 @@ $(function() {
                           votes+
                         '</span> '+
                         '<span>'+
-                        ' points by'+
+                        ' votes by '+
                         '</span> '+
                         '<a href="'+data[i].user.html_url+'">'+data[i].user.login+'</a> '+
                         '<span>'+
-                          '2 hours ago |'+
+                          moment(data[i].created_at).fromNow()+' | '+
                         '</span> '+
                         '<a href="'+data[i].html_url+'">'+data[i].comments+' comments</a>'+
                       '</p>'+

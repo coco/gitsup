@@ -4,6 +4,12 @@ body {
   background: #f6f6ef;
   color: #1d1d1d;
 }
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 header {
   background: #ff6600;
   overflow: hidden;
@@ -23,5 +29,5 @@ header h2 a:visited {
 ol {
   overflow: hidden;
   margin: 0;
-  padding: 20px 20px 20px 40px;
+  padding: 10px 20px 20px 40px;
 }
