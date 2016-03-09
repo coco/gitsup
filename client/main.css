@@ -10,6 +10,11 @@ a {
 a:hover {
   text-decoration: underline;
 }
+.bookmarklet {
+  border-radius: 5px;
+  border: 1px solid #1d1d1d;
+  padding: 3px;
+}
 header {
   background: #ff6600;
   overflow: hidden;
