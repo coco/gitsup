@@ -16,7 +16,7 @@ $(function() {
     }
 
     // A hack to know when it's ready to get data
-    Meteor.subscribe('default_db_data', function(){
+    Meteor.subscribe('votes', function(){
         $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
         $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
 
