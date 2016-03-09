@@ -6,6 +6,9 @@ var username = path[1]
 var repository = path[2]
 var listType = path[3]
 
+var repoId
+
+
 $(function() {
 
     if(typeof path[3] == 'undefined') {
@@ -19,7 +22,6 @@ $(function() {
 
         $('ol').empty()
 
-        var repoId;
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
 
@@ -31,6 +33,7 @@ $(function() {
                     $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+key, function(data) {
                         alreadyAdded.push(data.number)
                         $('ol').prepend(buildItem(data, tally.issues[data.number]))
+                        $('ol li.'+data.number+' .vote').click(clickVote)
                     })
                 })
             }
@@ -38,7 +41,6 @@ $(function() {
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
-
                       var votes
                       if (typeof tally == 'undefined') {
                         votes = 0
@@ -51,29 +53,7 @@ $(function() {
                       }
 
                       $('ol').append(buildItem(data[i], votes))
-
-                      $($('ol li .vote')[i]).click(function(e){
-                          if(Meteor.userId() == null) {
-                             alert('Sorry, you need to sign in first.')
-                             return
-                          }
-                          var $el = $(e.currentTarget)
-                          var $votes = $el.closest('li').find('.votes')
-
-                          var issueId = $el.data('issueId')
-                          var issueNumber = $el.data('issueNumber')
-                          var votes = $el.data('votes')
-
-                          $votes.html(votes + 1)
-
-                          Meteor.call("addVote", {
-                              repoId:repoId,
-                              issueNumber:issueNumber,
-                              issueId:issueId
-                          })
-                          console.log(repoId, issueId, Meteor.userId())
-                          return false
-                      })
+                      $('ol li.'+data[i].number+' .vote').click(clickVote)
                    }
 
                 }
@@ -83,7 +63,7 @@ $(function() {
 })
 
 function buildItem(item, votes) {
-    return '<li>'+
+    return '<li class="'+item.number+'">'+
               '<h3>'+
                 '<a href="#'+item.number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
                 '<a href="'+item.html_url+'">'+item.title+'</a> '+
@@ -103,4 +83,27 @@ function buildItem(item, votes) {
                 '<a href="'+item.html_url+'">'+item.comments+' comments</a>'+
               '</p>'+
             '</li>'
+}
+
+function clickVote(e) {
+      if(Meteor.userId() == null) {
+         alert('Sorry, you need to sign in first.')
+         return
+      }
+      var $el = $(e.currentTarget)
+      var $votes = $el.closest('li').find('.votes')
+
+      var issueId = $el.data('issueId')
+      var issueNumber = $el.data('issueNumber')
+      var votes = $el.data('votes')
+
+      $votes.html(votes + 1)
+
+      Meteor.call("addVote", {
+          repoId:repoId,
+          issueNumber:issueNumber,
+          issueId:issueId
+      })
+      console.log(repoId, issueId, Meteor.userId())
+      return false
 }
