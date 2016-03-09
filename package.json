@@ -1,6 +1,7 @@
 {
   "name": "gitsup",
   "scripts": {
+    "start": "meteor --settings settings.json",
     "deploy": "DEPLOY_HOSTNAME=galaxy.meteor.com meteor deploy gitsup.com --settings settings-production.json"
   }
 }

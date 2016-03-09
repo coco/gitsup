@@ -9,13 +9,19 @@ header {
   overflow: hidden;
 }
 header h2 {
+  float: left;
   margin: 10px;
 }
 header h2 a,
 header h2 a:visited {
   color: #1d1d1d;
 }
+#login-buttons{
+  margin: 10px;
+  float: right;
+}
 ol {
   overflow: hidden;
   margin: 0;
+  padding: 20px;
 }
