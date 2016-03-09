@@ -20,3 +20,4 @@ autopublish             # Publish all data to the clients (for prototyping)
 github
 accounts-github
 accounts-ui
+service-configuration
