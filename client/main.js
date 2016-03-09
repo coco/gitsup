@@ -27,13 +27,16 @@ $(function() {
                   $('ol').append(
                     '<li>'+
                       '<h3>'+
-                        '<a href="#'+data[i].number+'" class="vote" data-issue-id="'+data[i].id+'"><img src="/vote.gif" alt="Vote" /></a> '+
+                        '<a href="#'+data[i].number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+data[i].id+'"><img src="/vote.gif" alt="Vote" /></a> '+
                         '<a href="'+data[i].html_url+'">'+data[i].title+'</a> '+
                         '<span>(<a href="'+data[i].html_url+'">#'+data[i].number+'</a>)</span>'+
                       '</h3>'+
                       '<p>'+
+                        '<span class="votes">'+
+                          votes+
+                        '</span> '+
                         '<span>'+
-                          votes+' points by'+
+                        ' points by'+
                         '</span> '+
                         '<a href="'+data[i].user.html_url+'">'+data[i].user.login+'</a> '+
                         '<span>'+
@@ -44,9 +47,16 @@ $(function() {
                     '</li>'
                   )
                   $($('ol li .vote')[i]).click(function(e){
-                      var issueId = $(e.currentTarget).data('issueId')
+                      var $el = $(e.currentTarget)
+                      var $votes = $el.closest('li').find('.votes')
+
+                      var issueId = $el.data('issueId')
+                      var votes = $el.data('votes')
+
+                      $votes.html(votes + 1)
+
                       Meteor.call("addVote", {repoId:repoId, issueId:issueId})
-                      console.log(repoId, issueId)
+                      console.log(repoId, issueId, Meteor.userId())
                       return false
                   })
                 }
