@@ -62,6 +62,10 @@ $(function() {
                     '</li>'
                   )
                   $($('ol li .vote')[i]).click(function(e){
+                      if(Meteor.userId() == null) {
+                         alert('Sorry, you need to sign in first.')
+                         return
+                      }
                       var $el = $(e.currentTarget)
                       var $votes = $el.closest('li').find('.votes')
 
