@@ -23,5 +23,5 @@ header h2 a:visited {
 ol {
   overflow: hidden;
   margin: 0;
-  padding: 20px;
+  padding: 20px 20px 20px 40px;
 }
