@@ -8,6 +8,7 @@ Meteor.methods({
     var votes = Votes.find({
         userId:this.userId,
         issueId:vote.issueId,
+        issueNumber:vote.issueNumber,
         repoId:vote.repoId
     }).fetch()
 
@@ -21,17 +22,17 @@ Meteor.methods({
 
         if(tallys.length === 0) {
             var issues = {}
-            issues[vote.issueId] = 1
+            issues[vote.issueNumber] = 1
             Tallys.insert({
                 repoId: vote.repoId,
                 issues: issues
             })
         } else {
             var issues = tallys[0].issues
-            if(typeof issues[vote.issueId] == 'undefined') {
-                issues[vote.issueId] = 1
+            if(typeof issues[vote.issueNumber] == 'undefined') {
+                issues[vote.issueNumber] = 1
             } else {
-                issues[vote.issueId] = issues[vote.issueId] + 1
+                issues[vote.issueNumber] = issues[vote.issueNumber] + 1
             }
             Tallys.update({repoId: vote.repoId}, {$set: {issues: issues}})
         }

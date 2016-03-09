@@ -17,69 +17,90 @@ $(function() {
         $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
         $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
 
+        $('ol').empty()
+
         var repoId;
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
-            var tally = Tallys.find({repoId:repoId}).fetch()[0]
 
-            console.log(tally)
+            var tally = Tallys.find({repoId:repoId}).fetch()[0]
+            var alreadyAdded = []
+
+            if (typeof tally !== 'undefined') {
+                $.each(tally.issues, function(key, value) {
+                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+key, function(data) {
+                        alreadyAdded.push(data.number)
+                        $('ol').prepend(buildItem(data, tally.issues[data.number]))
+                    })
+                })
+            }
 
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
-                $('ol').empty()
                 for (i = 0; i < data.length; i++) {
+                  if(alreadyAdded.indexOf(data[i].number) == -1) {
 
-                  var votes
-                  if (typeof tally == 'undefined') {
-                    votes = 0
-                  } else {
-                    if(typeof tally.issues[data[i].id] == 'undefined') {
+                      var votes
+                      if (typeof tally == 'undefined') {
                         votes = 0
-                    } else {
-                        votes = tally.issues[data[i].id]
-                    }
-                  }
-
-                  $('ol').append(
-                    '<li>'+
-                      '<h3>'+
-                        '<a href="#'+data[i].number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+data[i].id+'"><img src="/vote.gif" alt="Vote" /></a> '+
-                        '<a href="'+data[i].html_url+'">'+data[i].title+'</a> '+
-                        '<span>(<a href="'+data[i].html_url+'">#'+data[i].number+'</a>)</span>'+
-                      '</h3>'+
-                      '<p>'+
-                        '<span class="votes">'+
-                          votes+
-                        '</span> '+
-                        '<span>'+
-                        ' votes by '+
-                        '</span> '+
-                        '<a href="'+data[i].user.html_url+'">'+data[i].user.login+'</a> '+
-                        '<span>'+
-                          moment(data[i].created_at).fromNow()+' | '+
-                        '</span> '+
-                        '<a href="'+data[i].html_url+'">'+data[i].comments+' comments</a>'+
-                      '</p>'+
-                    '</li>'
-                  )
-                  $($('ol li .vote')[i]).click(function(e){
-                      if(Meteor.userId() == null) {
-                         alert('Sorry, you need to sign in first.')
-                         return
+                      } else {
+                        if(typeof tally.issues[data[i].number] == 'undefined') {
+                            votes = 0
+                        } else {
+                            votes = tally.issues[data[i].number]
+                        }
                       }
-                      var $el = $(e.currentTarget)
-                      var $votes = $el.closest('li').find('.votes')
 
-                      var issueId = $el.data('issueId')
-                      var votes = $el.data('votes')
+                      $('ol').append(buildItem(data[i], votes))
 
-                      $votes.html(votes + 1)
+                      $($('ol li .vote')[i]).click(function(e){
+                          if(Meteor.userId() == null) {
+                             alert('Sorry, you need to sign in first.')
+                             return
+                          }
+                          var $el = $(e.currentTarget)
+                          var $votes = $el.closest('li').find('.votes')
 
-                      Meteor.call("addVote", {repoId:repoId, issueId:issueId})
-                      console.log(repoId, issueId, Meteor.userId())
-                      return false
-                  })
+                          var issueId = $el.data('issueId')
+                          var issueNumber = $el.data('issueNumber')
+                          var votes = $el.data('votes')
+
+                          $votes.html(votes + 1)
+
+                          Meteor.call("addVote", {
+                              repoId:repoId,
+                              issueNumber:issueNumber,
+                              issueId:issueId
+                          })
+                          console.log(repoId, issueId, Meteor.userId())
+                          return false
+                      })
+                   }
+
                 }
             })
         })
     })
 })
+
+function buildItem(item, votes) {
+    return '<li>'+
+              '<h3>'+
+                '<a href="#'+item.number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
+                '<a href="'+item.html_url+'">'+item.title+'</a> '+
+                '<span>(<a href="'+item.html_url+'">#'+item.number+'</a>)</span>'+
+              '</h3>'+
+              '<p>'+
+                '<span class="votes">'+
+                  votes+
+                '</span> '+
+                '<span>'+
+                ' votes by '+
+                '</span> '+
+                '<a href="'+item.user.html_url+'">'+item.user.login+'</a> '+
+                '<span>'+
+                  moment(item.created_at).fromNow()+' | '+
+                '</span> '+
+                '<a href="'+item.html_url+'">'+item.comments+' comments</a>'+
+              '</p>'+
+            '</li>'
+}
