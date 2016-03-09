@@ -5,8 +5,6 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized");
     }
 
-    var config = Accounts.loginServiceConfiguration.findOne({service: "github"});
-
     var votes = Votes.find({
         userId:this.userId,
         issueId:vote.issueId,
