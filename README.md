@@ -1,6 +1,4 @@
-# gitsup
-
-### Vote ^ any GitHub issue or pull request.
+# Vote up any GitHub issue.
 
 Go from [git**hub**.com/*user*/*repo*/issues](https://github.com/gitsup/gitsup/issues)
 to [git**sup**.com/*user*/*repo*/issues](https://gitsup.com/gitsup/gitsup/issues)
