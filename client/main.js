@@ -29,11 +29,11 @@ $(function() {
 
             var tally = Tallys.find({repoId:repoId}).fetch()[0]
 
-            var issues = $.map(tally.issues, function(value, index) {
-                return {number: value, issueNumber: index}
-            })
-
             if (typeof tally !== 'undefined') {
+
+                var issues = $.map(tally.issues, function(value, index) {
+                    return {number: value, issueNumber: index}
+                })
 
                 for (i = 0; i < issues.length; i++) {
                     alreadyAdded.push(issues[i].issueNumber)
