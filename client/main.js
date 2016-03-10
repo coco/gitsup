@@ -5,6 +5,7 @@ var path = parser.pathname.split('/')
 var username = path[1]
 var repository = path[2]
 var listType = path[3]
+var issueNumber = path[4]
 
 var repoId
 var page = 1
@@ -13,7 +14,7 @@ var alreadyAdded = []
 
 $(function() {
 
-    if(typeof path[3] == 'undefined') {
+    if(typeof listType == 'undefined') {
         return;
     }
 
@@ -22,7 +23,19 @@ $(function() {
         $('title').text(username+'/'+repository+'/'+listType+' · gitsup')
         $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
 
-        $('ol').empty()
+        $('ol.list').empty()
+
+        if(typeof issueNumber != 'undefined') {
+
+            $('ol.list').before('<ol class="single" start="0"></ol>')
+
+            $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issueNumber, function(data) {
+                var votes = Votes.find({issueId:data.id}).fetch()
+                $('ol.single').prepend(buildItem(data, votes.length))
+                $('ol.single li.'+data.number+' .vote').click(clickVote)
+            })
+
+        }
 
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
@@ -50,8 +63,8 @@ $(function() {
                 for (i = 0; i < issues.length; i++) {
                     alreadyAdded.push(issues[i].issueNumber)
                     $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].issueNumber, function(data) {
-                        $('ol').prepend(buildItem(data, tally.issues[data.number]))
-                        $('ol li.'+data.number+' .vote').click(clickVote)
+                        $('ol.list').prepend(buildItem(data, tally.issues[data.number]))
+                        $('ol.list li.'+data.number+' .vote').click(clickVote)
                     })
                 }
             }
@@ -70,15 +83,15 @@ $(function() {
                         }
                       }
 
-                      $('ol').append(buildItem(data[i], votes))
-                      $('ol li.'+data[i].number+' .vote').click(clickVote)
+                      $('ol.list').append(buildItem(data[i], votes))
+                      $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                    }
 
                 }
             })
         })
 
-        $('ol').after('<div class="showMore"><a href="#">show more</a></div>')
+        $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
 
         $('.showMore a').click(function() {
 
@@ -98,8 +111,8 @@ $(function() {
                         }
                       }
 
-                      $('ol').append(buildItem(data[i], votes))
-                      $('ol li.'+data[i].number+' .vote').click(clickVote)
+                      $('ol.list').append(buildItem(data[i], votes))
+                      $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                    }
 
                 }
@@ -115,7 +128,7 @@ function buildItem(item, votes) {
               '<h3>'+
                 '<a href="#'+item.number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
                 '<a href="'+item.html_url+'">'+item.title+'</a> '+
-                '<span>(<a href="'+item.html_url+'">#'+item.number+'</a>)</span>'+
+                '<span>(<a href="/'+username+'/'+repository+'/issues/'+item.number+'">#'+item.number+'</a>)</span>'+
               '</h3>'+
               '<p>'+
                 '<span class="votes">'+
