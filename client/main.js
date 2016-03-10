@@ -29,21 +29,24 @@ $(function() {
 
             var tally = Tallys.find({repoId:repoId}).fetch()[0]
 
+            var issues = $.map(tally.issues, function(value, index) {
+                return {number: value, issueNumber: index}
+            })
+
             if (typeof tally !== 'undefined') {
-                $.each(tally.issues, function(key, value) {
 
-                    alreadyAdded.push(key)
-
-                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+key, function(data) {
+                for (i = 0; i < issues.length; i++) {
+                    alreadyAdded.push(issues[i].issueNumber)
+                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].issueNumber, function(data) {
                         $('ol').prepend(buildItem(data, tally.issues[data.number]))
                         $('ol li.'+data.number+' .vote').click(clickVote)
                     })
-                })
+                }
             }
 
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
                 for (i = 0; i < data.length; i++) {
-                  if(alreadyAdded.indexOf(data[i].number) == -1) {
+                  if(alreadyAdded.indexOf(String(data[i].number)) == -1) {
                       var votes
                       if (typeof tally == 'undefined') {
                         votes = 0
