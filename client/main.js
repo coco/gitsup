@@ -7,6 +7,8 @@ var repository = path[2]
 var listType = path[3]
 
 var repoId
+var page = 1
+var alreadyAdded = []
 
 
 $(function() {
@@ -26,12 +28,13 @@ $(function() {
             repoId = data.id
 
             var tally = Tallys.find({repoId:repoId}).fetch()[0]
-            var alreadyAdded = []
 
             if (typeof tally !== 'undefined') {
                 $.each(tally.issues, function(key, value) {
+
+                    alreadyAdded.push(key)
+
                     $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+key, function(data) {
-                        alreadyAdded.push(data.number)
                         $('ol').prepend(buildItem(data, tally.issues[data.number]))
                         $('ol li.'+data.number+' .vote').click(clickVote)
                     })
@@ -59,6 +62,36 @@ $(function() {
                 }
             })
         })
+
+        $('ol').after('<div class="showMore"><a href="#">show more</a></div>')
+
+        $('.showMore a').click(function() {
+
+            page = page + 1
+
+            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType+'?page='+page, function(data) {
+                for (i = 0; i < data.length; i++) {
+                  if(alreadyAdded.indexOf(data[i].number) == -1) {
+                      var votes
+                      if (typeof tally == 'undefined') {
+                        votes = 0
+                      } else {
+                        if(typeof tally.issues[data[i].number] == 'undefined') {
+                            votes = 0
+                        } else {
+                            votes = tally.issues[data[i].number]
+                        }
+                      }
+
+                      $('ol').append(buildItem(data[i], votes))
+                      $('ol li.'+data[i].number+' .vote').click(clickVote)
+                   }
+
+                }
+            })
+            return false
+        })
+
     })
 })
 
