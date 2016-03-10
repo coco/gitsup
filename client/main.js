@@ -35,6 +35,18 @@ $(function() {
                     return {number: value, issueNumber: index}
                 })
 
+                function compare(a,b) {
+                  if (a.number < b.number) {
+                    return -1;
+                  } else if (a.number > b.number) {
+                    return 1;
+                  } else {
+                    return 0;
+                  }
+                }
+
+                issues.sort(compare)
+
                 for (i = 0; i < issues.length; i++) {
                     alreadyAdded.push(issues[i].issueNumber)
                     $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].issueNumber, function(data) {
