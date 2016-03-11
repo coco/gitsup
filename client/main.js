@@ -20,10 +20,19 @@ $(function() {
     // A hack to know when it's ready to get data
     Meteor.subscribe('default_db_data', function(){
         $('title').text(username+'/'+repository+' · gitsup')
-        if(typeof listType == 'undefined') {
-           listType = 'both'
+        if(typeof listType == 'undefined' || listType == "") {
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'">'+username+'/'+repository+'</a>')
+           $('h2').after('<ul><li><a href="/'+username+'/'+repository+'/issues">issues</a></li><li><a href="/'+username+'/'+repository+'/pulls">pulls</a></li></ul>')
+           listType = 'both'
+        } else if(typeof issueNumber != 'undefined') {
+           $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'/'+issueNumber+'">'+username+'/'+repository+'/'+listType+'/'+issueNumber+'</a>')
+           if(listType == 'pull') {
+                listType = 'pulls'
+           }
         } else {
+           if(listType == 'pull') {
+                listType = 'pulls'
+           }
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
         }
 
@@ -134,16 +143,21 @@ $(function() {
 
 function buildItem(item, votes) {
     var issueType
-    if(typeof item.pull_request == 'undefined') {
-        issueType = 'issue'
-    } else {
+    if(typeof item.pull_request != 'undefined' || listType == 'pulls') {
         issueType = 'pull'
+    } else {
+        issueType = 'issue'
+    }
+
+    var githubLinkType = listType
+    if (listType == 'pulls') {
+        githubLinkType = 'pull'
     }
     return '<li class="'+item.number+'">'+
               '<h3>'+
                 '<a href="#'+item.number+'" class="vote" data-issue-type="'+issueType+'" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
                 '<a href="'+item.html_url+'">'+item.title+'</a> '+
-                '<span>(<a href="/'+username+'/'+repository+'/issues/'+item.number+'">#'+item.number+'</a>)</span>'+
+                '<span>(<a href="/'+username+'/'+repository+'/'+githubLinkType+'/'+item.number+'">#'+item.number+'</a>)</span>'+
               '</h3>'+
               '<p>'+
                 '<span class="votes">'+

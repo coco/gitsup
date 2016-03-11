@@ -27,6 +27,25 @@ header h2 a,
 header h2 a:visited {
   color: #1d1d1d;
 }
+header ul {
+  float: left;
+  list-style-type: none;
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+header ul li {
+  float: left;
+  list-style-type: none;
+  padding: 0;
+}
+header ul li a {
+  margin: 0 5px;
+  line-height: 48px;
+  color: #1d1d1d;
+}
+header ul li:nth-child(1):after {
+  content: "/";
+}
 #login-buttons{
   margin: 10px;
   float: right;
