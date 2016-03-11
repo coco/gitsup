@@ -1,2 +1,2 @@
 Votes = new Mongo.Collection("votes")
-Tallys = new Mongo.Collection("tallys")
+Repos = new Mongo.Collection("repos")

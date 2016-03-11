@@ -40,13 +40,9 @@ $(function() {
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
 
-            var tally = Tallys.find({repoId:repoId}).fetch()[0]
+            var repo = Repos.find({repoId:repoId}).fetch()[0]
 
-            if (typeof tally !== 'undefined') {
-
-                var issues = $.map(tally.issues, function(value, index) {
-                    return {number: value, issueNumber: index}
-                })
+            if (typeof repo !== 'undefined') {
 
                 function compare(a,b) {
                   if (a.number < b.number) {
@@ -58,12 +54,13 @@ $(function() {
                   }
                 }
 
-                issues.sort(compare)
+                var issues = repo.issues.sort(compare)
 
                 for (i = 0; i < issues.length; i++) {
-                    alreadyAdded.push(issues[i].issueNumber)
-                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].issueNumber, function(data) {
-                        $('ol.list').prepend(buildItem(data, tally.issues[data.number]))
+                    alreadyAdded.push(issues[i].number)
+                    var votes = issues[i].votes
+                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].number, function(data) {
+                        $('ol.list').prepend(buildItem(data, votes))
                         $('ol.list li.'+data.number+' .vote').click(clickVote)
                     })
                 }
@@ -73,13 +70,13 @@ $(function() {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(String(data[i].number)) == -1) {
                       var votes
-                      if (typeof tally == 'undefined') {
+                      if (typeof repo == 'undefined') {
                         votes = 0
                       } else {
-                        if(typeof tally.issues[data[i].number] == 'undefined') {
+                        if(typeof repo.issues[data[i].number] == 'undefined') {
                             votes = 0
                         } else {
-                            votes = tally.issues[data[i].number]
+                            votes = repo.issues[data[i].number]
                         }
                       }
 
@@ -101,13 +98,13 @@ $(function() {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
                       var votes
-                      if (typeof tally == 'undefined') {
+                      if (typeof repo == 'undefined') {
                         votes = 0
                       } else {
-                        if(typeof tally.issues[data[i].number] == 'undefined') {
+                        if(typeof repo.issues[data[i].number] == 'undefined') {
                             votes = 0
                         } else {
-                            votes = tally.issues[data[i].number]
+                            votes = repo.issues[data[i].number]
                         }
                       }
 
@@ -124,9 +121,15 @@ $(function() {
 })
 
 function buildItem(item, votes) {
+    var issueType
+    if(typeof item.pull_request == 'undefined') {
+        issueType = 'issue'
+    } else {
+        issueType = 'pull'
+    }
     return '<li class="'+item.number+'">'+
               '<h3>'+
-                '<a href="#'+item.number+'" class="vote" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
+                '<a href="#'+item.number+'" class="vote" data-issue-type="'+issueType+'" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
                 '<a href="'+item.html_url+'">'+item.title+'</a> '+
                 '<span>(<a href="/'+username+'/'+repository+'/issues/'+item.number+'">#'+item.number+'</a>)</span>'+
               '</h3>'+
@@ -156,6 +159,7 @@ function clickVote(e) {
 
       var issueId = $el.data('issueId')
       var issueNumber = $el.data('issueNumber')
+      var issueType = $el.data('issueType')
       var votes = $el.data('votes')
 
       $votes.html(votes + 1)
@@ -163,6 +167,7 @@ function clickVote(e) {
       Meteor.call("addVote", {
           repoId:repoId,
           issueNumber:issueNumber,
+          issueType:issueType,
           issueId:issueId
       })
       console.log(repoId, issueId, Meteor.userId())
