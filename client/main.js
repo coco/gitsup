@@ -8,6 +8,7 @@ var listType = path[3]
 var issueNumber = path[4]
 
 var repoId
+var repoPath
 var page = 1
 var alreadyAdded = []
 
@@ -52,6 +53,7 @@ $(function() {
 
         $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
             repoId = data.id
+            repoPath = data.full_name
 
             var repo = Repos.find({repoId:repoId}).fetch()[0]
 
@@ -111,11 +113,18 @@ $(function() {
 
         $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
 
+        var githubLinkType = listType
+        if (listType == 'pulls') {
+            githubLinkType = 'pull'
+        }
+        if (listType == 'both') {
+            githubLinkType = 'issues'
+        }
         $('.showMore a').click(function() {
 
             page = page + 1
 
-            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType+'?page='+page, function(data) {
+            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubLinkType+'?page='+page, function(data) {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
                       var votes
@@ -158,7 +167,7 @@ function buildItem(item, votes) {
     }
     return '<li class="'+item.number+'">'+
               '<h3>'+
-                '<a href="#'+item.number+'" class="vote" data-issue-type="'+issueType+'" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
+                '<a href="#'+item.number+'" class="vote" data-repo-id="'+repoId+'" data-repo-path="'+repoPath+'" data-issue-type="'+issueType+'" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
                 '<a href="'+item.html_url+'">'+item.title+'</a> '+
                 '<span>(<a href="/'+username+'/'+repository+'/'+githubLinkType+'/'+item.number+'">#'+item.number+'</a>)</span>'+
               '</h3>'+
@@ -188,6 +197,8 @@ function clickVote(e) {
       var $el = $(e.currentTarget)
       var $votes = $el.closest('li').find('.votes')
 
+      var repoId = $el.data('repoId')
+      var repoPath = $el.data('repoPath')
       var issueId = $el.data('issueId')
       var issueNumber = $el.data('issueNumber')
       var issueType = $el.data('issueType')
@@ -197,6 +208,7 @@ function clickVote(e) {
 
       Meteor.call("addVote", {
           repoId:repoId,
+          repoPath:repoPath,
           issueNumber:issueNumber,
           issueType:issueType,
           issueId:issueId

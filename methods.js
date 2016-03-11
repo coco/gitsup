@@ -10,6 +10,7 @@ Meteor.methods({
         issueType:vote.issueType,
         issueId:vote.issueId,
         issueNumber:vote.issueNumber,
+        repoPath:vote.repoPath,
         repoId:vote.repoId
     }).fetch()
 
@@ -24,6 +25,7 @@ Meteor.methods({
         if(repos.length === 0) {
             Repos.insert({
                 repoId: vote.repoId,
+                repoPath: vote.repoPath,
                 issues: [{
                     votes: 1,
                     type: vote.issueType,
