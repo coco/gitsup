@@ -153,6 +153,9 @@ function buildItem(item, votes) {
     if (listType == 'pulls') {
         githubLinkType = 'pull'
     }
+    if (listType == 'both') {
+        githubLinkType = 'issues'
+    }
     return '<li class="'+item.number+'">'+
               '<h3>'+
                 '<a href="#'+item.number+'" class="vote" data-issue-type="'+issueType+'" data-votes="'+votes+'" data-issue-id="'+item.id+'" data-issue-number="'+item.number+'"><img src="/vote.gif" alt="Vote" /></a> '+
