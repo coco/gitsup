@@ -68,7 +68,7 @@ $(function() {
 
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+listType, function(data) {
                 for (i = 0; i < data.length; i++) {
-                  if(alreadyAdded.indexOf(String(data[i].number)) == -1) {
+                  if(alreadyAdded.indexOf(data[i].number) == -1) {
                       var votes
                       if (typeof repo == 'undefined') {
                         votes = 0

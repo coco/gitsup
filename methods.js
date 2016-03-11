@@ -38,7 +38,7 @@ Meteor.methods({
 
             var issueExists = false
             for (i = 0; i < issues.length; i++) {
-                if(issues[i].id == vote.id) {
+                if(issues[i].id == vote.issueId) {
                     issueExists = true
                     issues[i].votes = issues[i].votes + 1
                 }
