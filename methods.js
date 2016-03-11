@@ -22,8 +22,6 @@ Meteor.methods({
         }).fetch()
 
         if(repos.length === 0) {
-            var issues = {}
-            issues[vote.issueNumber] = 1
             Repos.insert({
                 repoId: vote.repoId,
                 issues: [{
