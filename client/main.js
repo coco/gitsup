@@ -75,10 +75,14 @@ $(function() {
                     alreadyAdded.push(issues[i].number)
                     if(listType == 'both' || (issues[i].type == 'issue' && listType == 'issues') || (issues[i].type == 'pull' && listType == 'pulls')) {
                         var votes = issues[i].votes
-                        $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].number, function(data) {
-                            $('ol.list').prepend(buildItem(data, votes))
-                            $('ol.list li.'+data.number+' .vote').click(clickVote)
-                        })
+                        $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].number,
+                            (function(data, votes) {
+                                return function(data) {
+                                    $('ol.list').prepend(buildItem(data, votes))
+                                    $('ol.list li.'+data.number+' .vote').click(clickVote)
+                                }
+                            })(data, votes)
+                        )
                     }
                 }
             }
@@ -91,18 +95,7 @@ $(function() {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
                       if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
-                          var votes
-                          if (typeof repo == 'undefined') {
-                            votes = 0
-                          } else {
-                            if(typeof repo.issues[data[i].number] == 'undefined') {
-                                votes = 0
-                            } else {
-                                votes = repo.issues[data[i].number]
-                            }
-                          }
-
-                          $('ol.list').append(buildItem(data[i], votes))
+                          $('ol.list').append(buildItem(data[i], 0))
                           $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                       }
                   }
@@ -127,18 +120,7 @@ $(function() {
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubLinkType+'?page='+page, function(data) {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
-                      var votes
-                      if (typeof repo == 'undefined') {
-                        votes = 0
-                      } else {
-                        if(typeof repo.issues[data[i].number] == 'undefined') {
-                            votes = 0
-                        } else {
-                            votes = repo.issues[data[i].number]
-                        }
-                      }
-
-                      $('ol.list').append(buildItem(data[i], votes))
+                      $('ol.list').append(buildItem(data[i], 0))
                       $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                    }
 
