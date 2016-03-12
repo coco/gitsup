@@ -16,6 +16,7 @@ Meteor.methods({
 
     if(votes.length === 0) {
         vote.userId = this.userId
+        vote.createdAt = Date.now()
         Votes.insert(vote)
 
         var repos = Repos.find({
