@@ -106,18 +106,15 @@ $(function() {
 
         $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
 
-        var githubLinkType = listType
-        if (listType == 'pulls') {
-            githubLinkType = 'pull'
-        }
+        var githubListType = listType
         if (listType == 'both') {
-            githubLinkType = 'issues'
+            githubListType = 'issues'
         }
         $('.showMore a').click(function() {
 
             page = page + 1
 
-            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubLinkType+'?page='+page, function(data) {
+            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
                       $('ol.list').append(buildItem(data[i], 0))
