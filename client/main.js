@@ -16,12 +16,22 @@ if(typeof repository == 'undefined') {
     return
 }
 
+var githubRequestData = {}
+
 $(function() {
   // fire this immediately to prevent markup flickering
   $('ol.list').empty()
 
     // A hack to know when it's ready to get data
     Meteor.subscribe('default_db_data', function(){
+
+        // set the access_token for requests if user is logged in
+        if(Meteor.user()) {
+            githubRequestData = {
+                "access_token": Meteor.user().services.github.accessToken
+            }
+        }
+
         // define the title element (( should this be moved to a template helper with an inline handlebars method? ))
         $('title').text(username+'/'+repository+' · gitsup')
         if(typeof listType == 'undefined' || listType == "") {
@@ -44,109 +54,130 @@ $(function() {
 
             $('ol.list').before('<ol class="single" start="0"></ol>')
 
-            $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issueNumber, function(data) {
-                var votes = Votes.find({issueId:data.id}).fetch()
-                $('ol.single').prepend(buildItem(data, votes.length))
-                $('ol.single li.'+data.number+' .vote').click(clickVote)
+            $.ajax('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issueNumber, {
+                data: githubRequestData,
+                success: function(data) {
+                    var votes = Votes.find({issueId:data.id}).fetch()
+                    $('ol.single').prepend(buildItem(data, votes.length))
+                    $('ol.single li.'+data.number+' .vote').click(clickVote)
+               }
             })
 
         }
 
-        $.get('https://api.github.com/repos/'+username+'/'+repository, function(data) {
-            repoId = data.id
-            repoPath = data.full_name
+        console.log(githubRequestData)
+        $.ajax('https://api.github.com/repos/'+username+'/'+repository, {
+            data: githubRequestData,
+            statusCode: {
+              403: function (response) {
+                 alert("Looks like you are at the GitHub API rate limit. Don't worry, you can sign in to keep browsing!");
+              }
+            },
+            success: function(data) {
+                repoId = data.id
+                repoPath = data.full_name
 
-            var repo = Repos.find({repoId:repoId}).fetch()[0]
+                var repo = Repos.find({repoId:repoId}).fetch()[0]
 
-            if (typeof repo !== 'undefined') {
+                if (typeof repo !== 'undefined') {
 
-                function compare(a,b) {
-                  if (a.votes < b.votes) {
-                    return -1;
-                  } else if (a.votes > b.votes) {
-                    return 1;
-                  } else {
-                    return 0;
-                  }
-                }
-
-                var issues = repo.issues.sort(compare)
-
-                for (i = 0; i < issues.length; i++) {
-                    alreadyAdded.push(issues[i].number)
-                    if(listType == 'both' || (issues[i].type == 'issue' && listType == 'issues') || (issues[i].type == 'pull' && listType == 'pulls')) {
-                        var votes = issues[i].votes
-                        $.get('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].number,
-                            (function(data, votes) {
-                                return function(data) {
-                                    $('ol.list').prepend(buildItem(data, votes))
-                                    $('ol.list li.'+data.number+' .vote').click(clickVote)
-                                }
-                            })(data, votes)
-                        )
+                    function compare(a,b) {
+                      if (a.votes < b.votes) {
+                        return -1;
+                      } else if (a.votes > b.votes) {
+                        return 1;
+                      } else {
+                        return 0;
+                      }
                     }
-                }
-            }
 
-            var githubListType = listType
-            if(listType == 'both') {
-                githubListType = 'issues'
-            }
-            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType, function(data) {
+                    var issues = repo.issues.sort(compare)
 
-                for (i = 0; i < data.length; i++) {
-                  if(alreadyAdded.indexOf(data[i].number) == -1) {
-                    if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
-                        $('ol.list').append(buildItem(data[i], 0))
-                        $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                    for (i = 0; i < issues.length; i++) {
+                        alreadyAdded.push(issues[i].number)
+                        if(listType == 'both' || (issues[i].type == 'issue' && listType == 'issues') || (issues[i].type == 'pull' && listType == 'pulls')) {
+                            var votes = issues[i].votes
+                            $.ajax('https://api.github.com/repos/'+username+'/'+repository+'/issues/'+issues[i].number, {
+                                data: githubRequestData,
+                                success: (function(data, votes) {
+                                    return function(data) {
+                                        $('ol.list').prepend(buildItem(data, votes))
+                                        $('ol.list li.'+data.number+' .vote').click(clickVote)
+                                    }
+                                })(data, votes)
+                            })
+                        }
                     }
-                  }
-                }
-
-                if(data.length >= 30) {
-                    $('ol.list').after('<div class="showMore"><img src="/loading-bars.svg" alt="Loading.." class="loading-icon"/></div>')
                 }
 
                 var githubListType = listType
-                if (listType == 'both') {
-                  githubListType = 'issues'
+                if(listType == 'both') {
+                    githubListType = 'issues'
                 }
-
-                // requests the next page of issues from github
-                function showMore(data){
-                  page++
-                  if($(".loading-icon")){$(".loading-icon").toggle()}
-                  $.ajax({
-                    url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
-                    data: data,
-                    success: function(data){
-                      if(data.length == 0){
-                        if(!$(".noMoreResults").length){
-                          $(".loading-icon").remove()
-                          $('ol.list').after('<div class="noMoreResults showMore"><a href="#">That\'s all the '+ githubListType +' for '+ repository +' :)</a></div>')
+                $.ajax('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType, {
+                    data: githubRequestData,
+                    success: function(data) {
+                        for (i = 0; i < data.length; i++) {
+                          if(alreadyAdded.indexOf(data[i].number) == -1) {
+                            if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
+                                $('ol.list').append(buildItem(data[i], 0))
+                                $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                            }
+                          }
                         }
-                      }
-                      for (i = 0; i < data.length; i++) {
-                        if(alreadyAdded.indexOf(data[i].number) == -1) {
-                            $('ol.list').append(buildItem(data[i], 0))
-                            $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                         }
-                      }
-                      if($(".loading-icon")){$(".loading-icon").toggle()}
-                    },
-                    failure: function(){console.log("failed to request more issues")},
-                    dataType : "json",
-                  });
-                  return false
-                }
 
-                // infinite scroll feature
-                $(window).scroll(function() {
-                   if($(window).scrollTop() + $(window).height() == $(document).height()) {
-                     showMore()
-                   }
-                });
-            })
+                        if(data.length >= 30) {
+                            $('ol.list').after('<div class="showMore"><img src="/loading-bars.svg" alt="Loading.." class="loading-icon"/></div>')
+                        }
+
+                        var githubListType = listType
+                        if (listType == 'both') {
+                          githubListType = 'issues'
+                        }
+
+                        // requests the next page of issues from github
+                        function showMore(data){
+                          data = $.extend({}, data, githubRequestData)
+                          page++
+                          if($(".loading-icon")){$(".loading-icon").toggle()}
+                          $.ajax({
+                            url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
+                            statusCode: {
+                              403: function (response) {
+                                 alert("Looks like you are at the GitHub API rate limit. Don't worry, you can sign in to keep browsing!");
+                              }
+                            },
+                            data: data,
+                            success: function(data){
+                              if(data.length == 0){
+                                if(!$(".noMoreResults").length){
+                                  $(".loading-icon").remove()
+                                  $('ol.list').after('<div class="noMoreResults showMore">That\'s all the '+ githubListType +' for '+ repository +' :)</div>')
+                                }
+                              }
+                              for (i = 0; i < data.length; i++) {
+                                if(alreadyAdded.indexOf(data[i].number) == -1) {
+                                    $('ol.list').append(buildItem(data[i], 0))
+                                    $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                                 }
+                              }
+                              if($(".loading-icon")){$(".loading-icon").toggle()}
+                            },
+                            failure: function(){console.log("failed to request more issues")},
+                            dataType : "json",
+                          });
+                          return false
+                        }
+
+                        // infinite scroll feature
+                        $(window).scroll(function() {
+                           if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                             showMore()
+                           }
+                        });
+                    }
+                })
+            }
         })
     })
 })
