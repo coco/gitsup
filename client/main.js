@@ -17,9 +17,12 @@ if(typeof repository == 'undefined') {
 }
 
 $(function() {
+  // fire this immediately to prevent markup flickering
+  $('ol.list').empty()
 
     // A hack to know when it's ready to get data
     Meteor.subscribe('default_db_data', function(){
+        // define the title element (( should this be moved to a template helper with an inline handlebars method? ))
         $('title').text(username+'/'+repository+' · gitsup')
         if(typeof listType == 'undefined' || listType == "") {
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'">'+username+'/'+repository+'</a>')
@@ -36,8 +39,6 @@ $(function() {
            }
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
         }
-
-        $('ol.list').empty()
 
         if(typeof issueNumber != 'undefined') {
 
@@ -103,29 +104,37 @@ $(function() {
 
                 }
 
-                if(data.length >= 30) {
-                    $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
-                }
+                // if(data.length >= 30) {
+                //     $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
+                // }
 
                 var githubListType = listType
                 if (listType == 'both') {
                     githubListType = 'issues'
                 }
-                $('.showMore a').click(function() {
 
-                    page = page + 1
+                function showMore(){
+                  page++
+                  $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
+                      for (i = 0; i < data.length; i++) {
+                        if(alreadyAdded.indexOf(data[i].number) == -1) {
+                            $('ol.list').append(buildItem(data[i], 0))
+                            $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                         }
+                      }
+                  })
+                  return false
+                }
+                // if a user clicks `show more`, loads more issues
+                // $('.showMore a').click(function(){showMore()})
 
-                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
-                        for (i = 0; i < data.length; i++) {
-                          if(alreadyAdded.indexOf(data[i].number) == -1) {
-                              $('ol.list').append(buildItem(data[i], 0))
-                              $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                           }
+                // infinite scroll feature
+                $(window).scroll(function() {
+                   if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                     showMore()
+                   }
+                });
 
-                        }
-                    })
-                    return false
-                })
             })
         })
     })
