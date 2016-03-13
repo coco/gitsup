@@ -60,9 +60,9 @@ $(function() {
             if (typeof repo !== 'undefined') {
 
                 function compare(a,b) {
-                  if (a.number < b.number) {
+                  if (a.votes < b.votes) {
                     return -1;
-                  } else if (a.number > b.number) {
+                  } else if (a.votes > b.votes) {
                     return 1;
                   } else {
                     return 0;
@@ -92,6 +92,7 @@ $(function() {
                 githubListType = 'issues'
             }
             $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType, function(data) {
+
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
                       if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
@@ -101,31 +102,32 @@ $(function() {
                   }
 
                 }
-            })
-        })
 
-        $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
-
-        var githubListType = listType
-        if (listType == 'both') {
-            githubListType = 'issues'
-        }
-        $('.showMore a').click(function() {
-
-            page = page + 1
-
-            $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
-                for (i = 0; i < data.length; i++) {
-                  if(alreadyAdded.indexOf(data[i].number) == -1) {
-                      $('ol.list').append(buildItem(data[i], 0))
-                      $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                   }
-
+                if(data.length >= 30) {
+                    $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
                 }
-            })
-            return false
-        })
 
+                var githubListType = listType
+                if (listType == 'both') {
+                    githubListType = 'issues'
+                }
+                $('.showMore a').click(function() {
+
+                    page = page + 1
+
+                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
+                        for (i = 0; i < data.length; i++) {
+                          if(alreadyAdded.indexOf(data[i].number) == -1) {
+                              $('ol.list').append(buildItem(data[i], 0))
+                              $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                           }
+
+                        }
+                    })
+                    return false
+                })
+            })
+        })
     })
 })
 
