@@ -17,9 +17,12 @@ if(typeof repository == 'undefined') {
 }
 
 $(function() {
+  // fire this immediately to prevent markup flickering
+  $('ol.list').empty()
 
     // A hack to know when it's ready to get data
     Meteor.subscribe('default_db_data', function(){
+        // define the title element (( should this be moved to a template helper with an inline handlebars method? ))
         $('title').text(username+'/'+repository+' · gitsup')
         if(typeof listType == 'undefined' || listType == "") {
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'">'+username+'/'+repository+'</a>')
@@ -36,8 +39,6 @@ $(function() {
            }
            $('h2').html('<a href="https://github.com/'+username+'/'+repository+'/'+listType+'">'+username+'/'+repository+'/'+listType+'</a>')
         }
-
-        $('ol.list').empty()
 
         if(typeof issueNumber != 'undefined') {
 
@@ -95,37 +96,56 @@ $(function() {
 
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
-                      if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
-                          $('ol.list').append(buildItem(data[i], 0))
-                          $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                      }
+                    if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
+                        $('ol.list').append(buildItem(data[i], 0))
+                        $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                    }
                   }
-
                 }
 
                 if(data.length >= 30) {
-                    $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
+                    $('ol.list').after('<div class="showMore"><img src="/loading-bars.svg" alt="Loading.." class="loading-icon"/></div>')
                 }
 
                 var githubListType = listType
                 if (listType == 'both') {
-                    githubListType = 'issues'
+                  githubListType = 'issues'
                 }
-                $('.showMore a').click(function() {
 
-                    page = page + 1
-
-                    $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
-                        for (i = 0; i < data.length; i++) {
-                          if(alreadyAdded.indexOf(data[i].number) == -1) {
-                              $('ol.list').append(buildItem(data[i], 0))
-                              $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                           }
-
+                // requests the next page of issues from github
+                function showMore(data){
+                  page++
+                  if($(".loading-icon")){$(".loading-icon").toggle()}
+                  $.ajax({
+                    url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
+                    data: data,
+                    success: function(data){
+                      if(data.length == 0){
+                        if(!$(".noMoreResults").length){
+                          $(".loading-icon").remove()
+                          $('ol.list').after('<div class="noMoreResults showMore"><a href="#">That\'s all the '+ githubListType +' for '+ repository +' :)</a></div>')
                         }
-                    })
-                    return false
-                })
+                      }
+                      for (i = 0; i < data.length; i++) {
+                        if(alreadyAdded.indexOf(data[i].number) == -1) {
+                            $('ol.list').append(buildItem(data[i], 0))
+                            $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                         }
+                      }
+                      if($(".loading-icon")){$(".loading-icon").toggle()}
+                    },
+                    failure: function(){console.log("failed to request more issues")},
+                    dataType : "json",
+                  });
+                  return false
+                }
+
+                // infinite scroll feature
+                $(window).scroll(function() {
+                   if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                     showMore()
+                   }
+                });
             })
         })
     })
