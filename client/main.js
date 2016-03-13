@@ -96,37 +96,44 @@ $(function() {
 
                 for (i = 0; i < data.length; i++) {
                   if(alreadyAdded.indexOf(data[i].number) == -1) {
-                      if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
-                          $('ol.list').append(buildItem(data[i], 0))
-                          $('ol.list li.'+data[i].number+' .vote').click(clickVote)
-                      }
+                    if(listType == 'both' || (typeof data[i].pull_request == 'undefined' && listType == 'issues') || listType == 'pulls') {
+                        $('ol.list').append(buildItem(data[i], 0))
+                        $('ol.list li.'+data[i].number+' .vote').click(clickVote)
+                    }
                   }
-
                 }
-
-                // if(data.length >= 30) {
-                //     $('ol.list').after('<div class="showMore"><a href="#">show more</a></div>')
-                // }
 
                 var githubListType = listType
                 if (listType == 'both') {
-                    githubListType = 'issues'
+                  githubListType = 'issues'
                 }
 
-                function showMore(){
+                // requests the next page of issues from github
+                function showMore(data){
                   page++
-                  $.get('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page, function(data) {
+                  $.ajax({
+                    url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
+                    data: data,
+                    success: function(data){
+                      if(data.length == 0){
+                        if(!$(".noMoreResults").length){
+                          $('ol.list').after('<div class="noMoreResults showMore"><a href="#">That\'s all the '+ githubListType +' for '+ repository +' :)</a></div>')
+                        }
+                      }
                       for (i = 0; i < data.length; i++) {
                         if(alreadyAdded.indexOf(data[i].number) == -1) {
                             $('ol.list').append(buildItem(data[i], 0))
                             $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                          }
                       }
-                  })
+                    },
+                    failure: function(){console.log("failed to request more issues")},
+                    dataType : "json",
+                  });
+
+
                   return false
                 }
-                // if a user clicks `show more`, loads more issues
-                // $('.showMore a').click(function(){showMore()})
 
                 // infinite scroll feature
                 $(window).scroll(function() {
