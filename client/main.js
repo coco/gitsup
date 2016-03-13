@@ -103,6 +103,10 @@ $(function() {
                   }
                 }
 
+                if(data.length >= 30) {
+                    $('ol.list').after('<div class="showMore"><img src="/loading-balls.svg" alt="Loading.." class="loading-icon"/></div>')
+                }
+
                 var githubListType = listType
                 if (listType == 'both') {
                   githubListType = 'issues'
@@ -111,12 +115,14 @@ $(function() {
                 // requests the next page of issues from github
                 function showMore(data){
                   page++
+                  if($(".loading-icon")){$(".loading-icon").toggle()}
                   $.ajax({
                     url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
                     data: data,
                     success: function(data){
                       if(data.length == 0){
                         if(!$(".noMoreResults").length){
+                          $(".loading-icon").remove()
                           $('ol.list').after('<div class="noMoreResults showMore"><a href="#">That\'s all the '+ githubListType +' for '+ repository +' :)</a></div>')
                         }
                       }
@@ -126,12 +132,11 @@ $(function() {
                             $('ol.list li.'+data[i].number+' .vote').click(clickVote)
                          }
                       }
+                      if($(".loading-icon")){$(".loading-icon").toggle()}
                     },
                     failure: function(){console.log("failed to request more issues")},
                     dataType : "json",
                   });
-
-
                   return false
                 }
 
@@ -141,7 +146,6 @@ $(function() {
                      showMore()
                    }
                 });
-
             })
         })
     })
