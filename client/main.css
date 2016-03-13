@@ -5,6 +5,10 @@ body {
   color: #1d1d1d;
   font-family: Verdana, Geneva, sans-serif;
 }
+.container {
+  position: relative;
+  padding-bottom: 65px;
+}
 a {
   text-decoration: none;
 }
@@ -74,4 +78,9 @@ ol.single {
   text-align: center;
 }
 
-.loading-icon {margin-top: -100px;}
+.showMore {
+  width: 100%;
+  position: absolute;
+  bottom: 15px;
+  text-align: center;
+}

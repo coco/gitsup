@@ -104,7 +104,7 @@ $(function() {
                 }
 
                 if(data.length >= 30) {
-                    $('ol.list').after('<div class="showMore"><img src="/loading-balls.svg" alt="Loading.." class="loading-icon"/></div>')
+                    $('ol.list').after('<div class="showMore"><img src="/loading-bars.svg" alt="Loading.." class="loading-icon"/></div>')
                 }
 
                 var githubListType = listType
