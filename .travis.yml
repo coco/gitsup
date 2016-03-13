@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - '0.10'
+services: mongodb
+install:
+  - npm install -g underscore chimp
+  - export PATH="$HOME/.meteor:$PATH"
+  - curl https://install.meteor.com/ | sh
+  - meteor build --directory $HOME/meteor-build
+  - cd ~/meteor-build/bundle/programs/server && npm install
+
+before_script:
+  - mongo mydb_test --eval 'db.addUser("travis", "test");'
+  - cd ~/meteor-build/bundle && node main.js &
+script:
+  - sleep 20; cd $TRAVIS_BUILD_DIR; chimp .config/chimp-ci.js
+env:
+  global:
+    secure: qVYfmvuqmHpi48zzaVnNqjzgbkl2NZ3ztCF9Pu/05MUuB5jULL/bX56TyPgRXHi9hym+5Tbm4K7xApUrFhK78x1zw4zPnjuXE1ewuN4RCs2GhZXgkkyuqrqav+sezA7QS9qX8OpfvkbgbFRBgoG2FYx6TkAySLvq4BnecY+wErCvAkA6Wa8Iy11XyxlWAhX5IeAgys8/pstMqtSXxhLCq2BzJajKJ9ndZu3wL9NZ0B60OGnSLe1NoY4Y8gKtZJiouwOQr9onLjMDLE8Eh+AirJVDib7JGMNt0hVYgxsGz6wEJFJP7stlrciJgguJwU8FkDM/Ulrlm1tCAIZAnVpI0pqeqSVKbyw5+3JTke9qjggAXaEczPK6Tj/1f9JRn4fuStTAKzweZsqbr2SaWgsjqG55wHm+q6+3rlTli/t7c51ij4dbBqb6i+ZjnXqRRhNriEVSHM/9VpjDrYx04tO6YrrQSrZHJPK+yHAL+/Yc53nSwaBKmPWc+RcNR9RVDDc3i6udIQvdY3LpoicJuU2MgmxOqBgmHa9XxTPIYtA2imCDm3RRaOVegVQI8j/wSppLl9vT19xtPVf9WKvoZfn5HgrEhBijR3jMwnJ9BgCZoHKx4cUa4Sy8WuQvKtyBQbzL9zm48jl5fcC57vELe/xbaBl4nsONxQ75GBJx86S0Uf4=
+    MONGO_URL: 'mongodb://travis:test@host:27017/meteor'
+    ROOT_URL: 'http://localhost:3000'
+    PORT: 3000
