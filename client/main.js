@@ -65,7 +65,6 @@ $(function() {
 
         }
 
-        console.log(githubRequestData)
         $.ajax('https://api.github.com/repos/'+username+'/'+repository, {
             data: githubRequestData,
             statusCode: {
@@ -101,8 +100,11 @@ $(function() {
                                 data: githubRequestData,
                                 success: (function(data, votes) {
                                     return function(data) {
-                                        $('ol.list').prepend(buildItem(data, votes))
-                                        $('ol.list li.'+data.number+' .vote').click(clickVote)
+                                        //Only show open issues for now
+                                        if(data.state == 'open') {
+                                            $('ol.list').prepend(buildItem(data, votes))
+                                            $('ol.list li.'+data.number+' .vote').click(clickVote)
+                                        }
                                     }
                                 })(data, votes)
                             })
