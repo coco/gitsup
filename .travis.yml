@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - '0.10'
+services: mongodb
+install:
+  - npm install -g underscore chimp
+  - export PATH="$HOME/.meteor:$PATH"
+  - curl https://install.meteor.com/ | sh
+  - meteor build --directory $HOME/meteor-build
+  - cd ~/meteor-build/bundle/programs/server && npm install
+
+before_script:
+  - echo $METEOR_SETTINGS
+  - mongo mydb_test --eval 'db.addUser("travis", "test");'
+  - cd ~/meteor-build/bundle && node main.js &
+script:
+  - sleep 20; cd $TRAVIS_BUILD_DIR; chimp .config/chimp-ci.js
+env:
+  global:
+    - MONGO_URL='mongodb://travis:test@host:27017/meteor'
+    - ROOT_URL='http://localhost:3000'
+    - PORT=3000
