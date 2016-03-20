@@ -23,3 +23,4 @@ service-configuration
 momentjs:moment
 iron:router
 http
+reactive-var

@@ -1,0 +1,12 @@
+<template name="issuesIndexItem">
+  <h3>
+    <a href="" class="vote" data-action="vote"><img src="/vote.gif" alt="Vote"></a>
+    <a href="{{html_url}}">{{title}}</a> <span>(<a href="{{html_url}}">#{{number}}</a>)</span>
+  </h3>
+  <p>
+    <span class="votes">3 votes | </span>
+    <span>created by <a href="{{user.html_url}}">{{user.login}}</a></span>
+    <span>11 days ago | </span>
+    <a href="{{html_url}}">{{comments}} comments</a>
+  </p>
+</template>

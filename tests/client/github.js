@@ -18,7 +18,7 @@ describe('Github object', function() {
 
   it('.issues should fetch Github issues @watch', function () {
     var githubResponse = browser.executeAsync(function(next) {
-      Github.issues('gitsup', 'gitsup', function(res) {
+      Github.issues('gitsup', 'gitsup', function(err, res) {
         next(res);
       })
     });

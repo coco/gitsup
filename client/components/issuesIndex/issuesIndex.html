@@ -7,4 +7,10 @@
     <li>Filter: {{filter}}</li>
     <li>Url: <a href="{{example}}" target="_blank">{{example}}</a></li>
   </ul>
+
+  <ul>
+    {{#each issues}}
+      <li>{{> issuesIndexItem}}</li>
+    {{/each}}
+  </ul>
 </template>
