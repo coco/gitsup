@@ -1,5 +1,5 @@
 module.exports = {
-  browser: 'phantomjs',
+  browser: 'chrome',
   ddp: 'http://localhost:3000',
   cucumber: false,
   mocha: true,

@@ -1,3 +1,3 @@
-Meteor.publish('votes', function(){
-    return Votes.findOne();
+Meteor.publish('votes', function(issueId){
+  return Votes.find({issueId: issueId});
 })

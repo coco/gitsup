@@ -22,3 +22,5 @@ accounts-ui
 service-configuration
 momentjs:moment
 iron:router
+http
+reactive-var
