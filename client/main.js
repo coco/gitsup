@@ -65,7 +65,7 @@ $(function() {
 
         }
 
-        $.ajax('https://api.github.com/repos/'+username+'/'+repository, {
+        $.ajax('https://api.github.com/repos/'+username+'/'+repository+'?state=all', {
             data: githubRequestData,
             statusCode: {
               403: function (response) {
@@ -100,11 +100,8 @@ $(function() {
                                 data: githubRequestData,
                                 success: (function(data, votes) {
                                     return function(data) {
-                                        //Only show open issues for now
-                                        if(data.state == 'open') {
-                                            $('ol.list').prepend(buildItem(data, votes))
-                                            $('ol.list li.'+data.number+' .vote').click(clickVote)
-                                        }
+                                        $('ol.list').prepend(buildItem(data, votes))
+                                        $('ol.list li.'+data.number+' .vote').click(clickVote)
                                     }
                                 })(data, votes)
                             })
@@ -116,7 +113,7 @@ $(function() {
                 if(listType == 'both') {
                     githubListType = 'issues'
                 }
-                $.ajax('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType, {
+                $.ajax('https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?state=all', {
                     data: githubRequestData,
                     success: function(data) {
                         for (i = 0; i < data.length; i++) {
@@ -143,7 +140,7 @@ $(function() {
                           page++
                           if($(".loading-icon")){$(".loading-icon").toggle()}
                           $.ajax({
-                            url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page,
+                            url: 'https://api.github.com/repos/'+username+'/'+repository+'/'+githubListType+'?page='+page+'&state=all',
                             statusCode: {
                               403: function (response) {
                                  alert("Looks like you are at the GitHub API rate limit. Don't worry, you can sign in to keep browsing!");
