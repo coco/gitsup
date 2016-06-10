@@ -37,7 +37,6 @@
                 }
             })
 
-
             var page = 1
             var alreadyAdded = []
 
@@ -159,45 +158,6 @@
                       '</p>'+
                     '</li>'
         }
-    }
-
-    if (Meteor.isServer) {
-        Meteor.startup(function () {
-            Meteor.methods({
-                syncIssues: function (state) {
-                    var userName = state.userName
-                    var projectName = state.projectName
-                    var page = 1
-
-                    while(page) {
-                        var issues = Meteor.http.call('GET', 'https://api.github.com/repos/'+userName+'/'+projectName+'/issues?page='+page+'&state=all&access_token='+Meteor.settings.githubToken)
-
-                        if(issues.length < 1) {
-                            break
-                        }
-
-                        for(var i = 0; i < issues.length; i++) {
-                            var issue = issues[i]
-                            var existingIssue = Issues.find({id: issue.id}).fetch[0]
-
-                            if(typeof existingIssue != 'undefined') {
-                                Issues.update({id: issue.id}, {$set: issue})
-                            } else {
-                                Issues.insert(issue)
-                            }
-                        }
-
-                        page = page + 1
-                    }
-
-                }
-            })
-
-            // A hack to know when it's ready to get data
-            Meteor.publish('default_db_data', function(){
-                return Issues.find({},{limit:1})
-            })
-        })
     }
     </script>
 </head>
