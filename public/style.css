@@ -5,20 +5,11 @@ body {
   color: #1d1d1d;
   font-family: Verdana, Geneva, sans-serif;
 }
-.container {
-  position: relative;
-  padding-bottom: 65px;
-}
 a {
   text-decoration: none;
 }
 a:hover {
   text-decoration: underline;
-}
-.bookmarklet {
-  border-radius: 5px;
-  border: 1px solid #1d1d1d;
-  padding: 3px;
 }
 header {
   background: #ff6600;
@@ -50,12 +41,14 @@ header ul li a {
   line-height: 48px;
   color: #1d1d1d;
 }
-header ul li:nth-child(1):after {
-  content: "/";
+.bookmarklet {
+  line-height: 35px;
+  border-radius: 5px;
+  border: 1px solid #1d1d1d;
+  padding: 3px;
 }
-#login-buttons{
-  margin: 10px;
-  float: right;
+.page {
+  padding: 30px;
 }
 ol {
   overflow: hidden;
@@ -72,6 +65,7 @@ ol h4 {
 ol.single {
   background: #eee;
 }
+
 .showMore {
   padding: 20px;
   text-align: center;
