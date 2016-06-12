@@ -4,7 +4,6 @@ if (Meteor.isClient) {
     var parser = document.createElement('a')
     parser.href = document.location.href
     var path = parser.pathname.split('/')
-    console.log(path)
 
     var userName = path[1]
     var projectName = path[2]
@@ -142,16 +141,26 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-    console.log("server works")
     Meteor.startup(function () {
         Meteor.methods({
             syncIssues: function (state) {
                 var userName = state.userName
                 var projectName = state.projectName
+                var apiURL = 'https://api.github.com/repos/'+userName+'/'+projectName+'/issues'
                 var page = 1
 
                 while(page) {
-                    var issues = HTTP.call('GET', 'https://api.github.com/repos/'+userName+'/'+projectName+'/issues?page='+page+'&state=all&access_token='+Meteor.settings.githubToken, {headers:{"User-Agent":"gitsup","Accept":"application/vnd.github.squirrel-girl-preview"}})
+
+                    var issues = HTTP.call('GET', apiURL, {
+                        params: {
+                            page: page,
+                            state: "all",
+                            access_token: Meteor.settings.githubToken,
+                        }, headers: {
+                            "User-Agent":"gitsup",
+                            "Accept":"application/vnd.github.squirrel-girl-preview"
+                        }
+                    })
 
                     if(issues.length < 1) {
                         break
