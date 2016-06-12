@@ -160,7 +160,7 @@ if (Meteor.isServer) {
                             "User-Agent":"gitsup",
                             "Accept":"application/vnd.github.squirrel-girl-preview"
                         }
-                    })
+                    }).data
 
                     if(issues.length < 1) {
                         break
