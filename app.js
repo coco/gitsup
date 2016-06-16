@@ -10,20 +10,11 @@ if (Meteor.isClient) {
 
     var state = { userName:userName, projectName:projectName }
 
-    Meteor.call('syncIssues', state, function(err, response) {
-        if(err) {
-            Session.set('serverDataResponse', "Error:" + err.reason)
-            return
-        }
-    })
-
-    Deps.autorun(function() {
-        Meteor.subscribe('items', state)
-    })
+    Meteor.call('syncIssues', state)
 
     Template.issues.helpers({
         items: function() {
-            return Issues.find({}, {sort:{votes: -1}})
+            return Issues.find(state, {sort:{votes: -1}})
         }
     })
 }
@@ -71,12 +62,7 @@ if (Meteor.isServer) {
 
                     page = page + 1
                 }
-
             }
-        })
-
-        Meteor.publish('issues', function(state){
-            return Issues.find({userName: state.userName, projectName: state.projectName},{sort:{votes: -1}})
         })
     })
 }
