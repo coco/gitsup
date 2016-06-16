@@ -55,6 +55,7 @@ if (Meteor.isServer) {
                             votes: issue.reactions['+1'],
                             title: issue.title,
                             number: issue.number,
+                            state: issue.state,
                             html_url: issue.html_url
                         }
 
