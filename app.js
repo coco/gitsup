@@ -60,10 +60,10 @@ if (Meteor.isServer) {
                             html_url: issue.html_url
                         }
 
-                        var existingIssue = Issues.find({id: issue.id}).fetch()[0]
+                        var existingIssue = Issues.find({id: issue.id, userName: userName, projectName: projectName}).fetch()[0]
 
                         if(typeof existingIssue != 'undefined') {
-                            Issues.update({id: issue.id}, {$set: item})
+                            Issues.update({id: issue.id, userName: userName, projectName: projectName}, {$set: item})
                         } else {
                             Issues.insert(item)
                         }
