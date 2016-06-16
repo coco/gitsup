@@ -46,17 +46,24 @@ if (Meteor.isServer) {
                     }
 
                     for(var i = 0; i < issues.length; i++) {
+
                         var issue = issues[i]
-                        issue.userName = userName
-                        issue.projectName = projectName
-                        issue.votes = issue.reactions['+1']
+
+                        var item = {
+                            userName: userName,
+                            projectName: projectName,
+                            votes: issue.reactions['+1'],
+                            title: issue.title,
+                            number: issue.number,
+                            html_url: issue.html_url
+                        }
 
                         var existingIssue = Issues.find({id: issue.id}).fetch()[0]
 
                         if(typeof existingIssue != 'undefined') {
-                            Issues.update({id: issue.id}, {$set: issue})
+                            Issues.update({id: issue.id}, {$set: item})
                         } else {
-                            Issues.insert(issue)
+                            Issues.insert(item)
                         }
                     }
 
