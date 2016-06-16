@@ -7,6 +7,9 @@ body {
 }
 h1 {
   text-align: center;
+  margin: 0;
+  line-height: 50px;
+  font-size: 24px;
 }
 hr {
   margin: 0 0 20px 0;
@@ -23,7 +26,7 @@ p {
 header {
   background: #ff6600;
   overflow: hidden;
-  min-height: 80px;
+  min-height: 50px;
   line-height: 54px;
 }
 header h2 {
@@ -58,7 +61,7 @@ header ul li a {
   padding: 3px;
 }
 .page {
-  padding: 30px;
+  padding: 15px 30px;
 }
 ol {
   list-style-type: none;
