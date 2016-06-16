@@ -17,9 +17,6 @@ if (Meteor.isClient) {
         }
     })
 
-    var ITEMS_INCREMENT = 30
-    Session.setDefault('itemsLimit', ITEMS_INCREMENT)
-    state.limit = Session.get('itemsLimit')
     Deps.autorun(function() {
         Meteor.subscribe('items', state)
     })
@@ -27,32 +24,8 @@ if (Meteor.isClient) {
     Template.issues.helpers({
         items: function() {
             return Issues.find({}, {sort:{votes: -1}})
-        },
-        moreResults: function() {
-            return !(Issues.find().count() < Session.get("itemsLimit"))
         }
     })
- 
-    function showMoreVisible() {
-        var threshold, target = $("#showMoreResults")
-        if (!target.length) return
-     
-        threshold = $(window).scrollTop() + $(window).height() - target.height()
-     
-        if (target.offset().top < threshold) {
-            if (!target.data("visible")) {
-                target.data("visible", true)
-                Session.set("itemsLimit",
-                    Session.get("itemsLimit") + ITEMS_INCREMENT)
-            }
-        } else {
-            if (target.data("visible")) {
-                target.data("visible", false)
-            }
-        }        
-    }
- 
-    $(window).scroll(showMoreVisible)
 }
 
 if (Meteor.isServer) {
@@ -103,7 +76,7 @@ if (Meteor.isServer) {
         })
 
         Meteor.publish('issues', function(state){
-            return Issues.find({userName: state.userName, projectName: state.projectName},{limit:state.limit, sort:{votes: -1}})
+            return Issues.find({userName: state.userName, projectName: state.projectName},{sort:{votes: -1}})
         })
     })
 }
