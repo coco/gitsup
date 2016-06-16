@@ -50,6 +50,7 @@ if (Meteor.isServer) {
                         var issue = issues[i]
 
                         var item = {
+                            id: issue.id,
                             userName: userName,
                             projectName: projectName,
                             votes: issue.reactions['+1'],
