@@ -37,9 +37,9 @@
   <ol>
     {{#each items}}
       <li>
-        <a href="{{html_url}}">{{title}} / #{{number}}</a>
+        <a href="{{html_url}}">{{title}} (#{{number}})</a>
         <br />
-        <span>{{votes}} votes</span>
+        <span>{{votes}} votes</span> // <span>{{state}}</span>
       </li>
     {{/each}}
   </ol>
