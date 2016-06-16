@@ -28,9 +28,9 @@
     </header>
     <div class="page">
         <p>Go to <a href="https://gitsup.herokuapp.com/coco/gitsup">gitsup.herokuapp.com/user/project</a> to see an issue list sorted by "up" votes. Or save this handy bookmarklet for toggling the url: <a class="bookmarklet" href="javascript:if(location.host.indexOf('gitsup.herokuapp.com') == -1){location.host='gitsup.herokuapp.com'}else{location.host='github.com'};">sup</a></p>
-
-    {{> issues}}
-</div>
+        <hr />
+        {{> issues}}
+    </div>
 </body>
 
 <template name="issues">
@@ -38,6 +38,7 @@
     {{#each items}}
       <li>
         <a href="">{{title}} / #{{number}}</a>
+        <br />
         <span>{{votes}} votes</span>
       </li>
     {{/each}}
