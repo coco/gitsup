@@ -26,7 +26,7 @@ if (Meteor.isClient) {
 
     Template.issues.helpers({
         items: function() {
-            return Issues.find({})
+            return Issues.find({}, {sort:{votes: -1}})
         },
         moreResults: function() {
             return !(Issues.find().count() < Session.get("itemsLimit"))
@@ -103,7 +103,7 @@ if (Meteor.isServer) {
         })
 
         Meteor.publish('issues', function(state){
-            return Issues.find({userName: state.userName, projectName: state.projectName},{limit:state.limit})
+            return Issues.find({userName: state.userName, projectName: state.projectName},{limit:state.limit, sort:{votes: -1}})
         })
     })
 }
