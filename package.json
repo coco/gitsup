@@ -1,0 +1,7 @@
+{
+  "name": "gitsup",
+  "scripts": {
+    "start": "meteor --settings settings.json",
+    "deploy": "git push heroku develop:master"
+  }
+}
