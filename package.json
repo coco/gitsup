@@ -3,8 +3,5 @@
   "scripts": {
     "start": "meteor --settings settings.json",
     "deploy": "git push heroku release:master"
-  },
-  "dependencies": {
-    "loading-svg": "^1.0.0"
   }
 }
