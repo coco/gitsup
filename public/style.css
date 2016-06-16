@@ -5,6 +5,9 @@ body {
   color: #1d1d1d;
   font-family: Verdana, Geneva, sans-serif;
 }
+h1 {
+  text-align: center;
+}
 a {
   text-decoration: none;
 }

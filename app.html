@@ -36,7 +36,10 @@
 <template name="issues">
   <ol>
     {{#each items}}
-      <li>{{title}}</li>
+      <li>
+        <a href="">{{title}} / #{{number}}</a>
+        <span>{{votes}} votes</span>
+      </li>
     {{/each}}
   </ol>
 {{#if moreResults}}

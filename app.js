@@ -85,6 +85,7 @@ if (Meteor.isServer) {
                         var issue = issues[i]
                         issue.userName = userName
                         issue.projectName = projectName
+                        issue.votes = issue.reactions['+1']
 
                         var existingIssue = Issues.find({id: issue.id}).fetch()[0]
 
