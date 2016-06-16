@@ -14,7 +14,7 @@ if (Meteor.isClient) {
 
     Template.issues.helpers({
         items: function() {
-            return Issues.find(state, {sort:{votes: -1}})
+            return Issues.find(state, {sort:{votes: -1, comments: -1}})
         }
     })
 }
