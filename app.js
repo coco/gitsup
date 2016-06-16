@@ -56,6 +56,7 @@ if (Meteor.isServer) {
                             title: issue.title,
                             number: issue.number,
                             state: issue.state,
+                            comments: issue.comments,
                             html_url: issue.html_url
                         }
 
