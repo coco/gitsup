@@ -1,7 +1,6 @@
 Issues = new Mongo.Collection("issues")
 Projects = new Mongo.Collection("projects")
 
-
 if (Meteor.isClient) {
     var parser = document.createElement('a')
     parser.href = document.location.href
@@ -10,39 +9,32 @@ if (Meteor.isClient) {
     var userName = path[1]
     var projectName = path[2]
 
-    Session.setDefault('itemsLimit', 100)
-
     var state = {
         userName: userName, 
-        projectName: projectName,
-        limit: Session.get('itemsLimit')
+        projectName: projectName
     }
 
     Meteor.call('syncIssues', state)
 
-    Meteor.subscribe('issues', state)
+    Session.setDefault('itemsLimit', 100)
+
+    Meteor.subscribe('issues', state, Session.get('itemsLimit'))
 
     Template.issues.helpers({
         items: function() {
-            return Issues.find({
-                userName:userName,
-                projectName:projectName
-            },{
-                sort:{ votes: -1, comments: -1 },
-                limit: Session.get('itemsLimit')
-            })
+            return Issues.find({})
         }
     })
 }
 
 if (Meteor.isServer) {
-    Meteor.publish('issues', function(state) {
+    Meteor.publish('issues', function(state, limit) {
         return Issues.find({
             userName:state.userName,
             projectName:state.projectName
         },{
             sort:{ votes: -1, comments: -1 },
-            limit: state.limit
+            limit: limit
         })
     })
     Meteor.startup(function () {
