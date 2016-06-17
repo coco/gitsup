@@ -25,6 +25,12 @@ if (Meteor.isClient) {
             return Issues.find({})
         }
     })
+
+    setInterval(function() {
+        if($('ol li').length) {
+            $('#loader').remove()
+        }
+    }, 500)
 }
 
 if (Meteor.isServer) {
