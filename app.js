@@ -1,4 +1,5 @@
 Issues = new Mongo.Collection("issues")
+Projects = new Mongo.Collection("projects")
 
 if (Meteor.isClient) {
     var parser = document.createElement('a')
@@ -25,52 +26,75 @@ if (Meteor.isServer) {
             syncIssues: function (state) {
                 var userName = state.userName
                 var projectName = state.projectName
-                var apiURL = 'https://api.github.com/repos/'+userName+'/'+projectName+'/issues'
-                var page = 1
+                var shouldUpdateIssues = true
 
-                while(page) {
+                var existingProject = Projects.find({userName:userName,projectName:projectName}).fetch()[0]
 
-                    var issues = HTTP.call('GET', apiURL, {
-                        params: {
-                            page: page,
-                            state: "all",
-                            access_token: Meteor.settings.githubToken,
-                        }, headers: {
-                            "User-Agent":"gitsup",
-                            "Accept":"application/vnd.github.squirrel-girl-preview"
-                        }
-                    }).data
+                var projectData = {
+                    userName: userName,
+                    projectName: projectName,
+                    lastUpdate: Date.now()
+                }
 
-                    if(issues.length < 1) {
-                        break
+                if(typeof existingProject != 'undefined') {
+                    Projects.update({userName: userName, projectName: projectName}, {$set: projectData})
+
+                    if(Date.now() - existingProject.lastUpdate < 3600000) {
+                       shouldUpdateIssues = false 
                     }
+                } else {
+                    Projects.insert(projectData)
+                }
 
-                    for(var i = 0; i < issues.length; i++) {
+                if(shouldUpdateIssues) {
 
-                        var issue = issues[i]
+                    var apiURL = 'https://api.github.com/repos/'+userName+'/'+projectName+'/issues'
+                    var page = 1
 
-                        var item = {
-                            id: issue.id,
-                            userName: userName,
-                            projectName: projectName,
-                            votes: issue.reactions['+1'],
-                            title: issue.title,
-                            number: issue.number,
-                            state: issue.state,
-                            comments: issue.comments,
-                            html_url: issue.html_url
+                    while(page) {
+
+                        var issues = HTTP.call('GET', apiURL, {
+                            params: {
+                                page: page,
+                                state: "all",
+                                access_token: Meteor.settings.githubToken,
+                            }, headers: {
+                                "User-Agent":"gitsup",
+                                "Accept":"application/vnd.github.squirrel-girl-preview"
+                            }
+                        }).data
+
+                        if(issues.length < 1) {
+                            break
                         }
 
-                        var existingIssue = Issues.find({id: issue.id, userName: userName, projectName: projectName}).fetch()[0]
+                        for(var i = 0; i < issues.length; i++) {
 
-                        if(typeof existingIssue != 'undefined') {
-                            Issues.update({id: issue.id, userName: userName, projectName: projectName}, {$set: item})
-                        } else {
-                            Issues.insert(item)
+                            var issue = issues[i]
+
+                            var item = {
+                                id: issue.id,
+                                userName: userName,
+                                projectName: projectName,
+                                votes: issue.reactions['+1'],
+                                title: issue.title,
+                                number: issue.number,
+                                state: issue.state,
+                                comments: issue.comments,
+                                html_url: issue.html_url
+                            }
+
+                            var existingIssue = Issues.find({id: issue.id, userName: userName, projectName: projectName}).fetch()[0]
+
+                            if(typeof existingIssue != 'undefined') {
+                                Issues.update({id: issue.id, userName: userName, projectName: projectName}, {$set: item})
+                            } else {
+                                Issues.insert(item)
+                            }
                         }
+
+                        page = page + 1
                     }
-
-                    page = page + 1
                 }
             }
         })
