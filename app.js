@@ -10,7 +10,7 @@ if (Meteor.isClient) {
     var userName = path[1]
     var projectName = path[2]
 
-    Session.setDefault('itemsLimit', 30)
+    Session.setDefault('itemsLimit', 100)
 
     var state = {
         userName:userName, 
