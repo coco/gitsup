@@ -13,20 +13,38 @@ if (Meteor.isClient) {
     Session.setDefault('itemsLimit', 100)
 
     var state = {
-        userName:userName, 
-        projectName:projectName
+        userName: userName, 
+        projectName: projectName,
+        limit: Session.get('itemsLimit')
     }
 
     Meteor.call('syncIssues', state)
 
+    Meteor.subscribe('issues', state)
+
     Template.issues.helpers({
         items: function() {
-            return Issues.find({userName:userName,projectName:projectName},{sort:{votes: -1, comments: -1}, limit:Session.get('itemsLimit')})
+            return Issues.find({
+                userName:userName,
+                projectName:projectName
+            },{
+                sort:{ votes: -1, comments: -1 },
+                limit: Session.get('itemsLimit')
+            })
         }
     })
 }
 
 if (Meteor.isServer) {
+    Meteor.publish('issues', function(state) {
+        return Issues.find({
+            userName:state.userName,
+            projectName:state.projectName
+        },{
+            sort:{ votes: -1, comments: -1 },
+            limit: state.limit
+        })
+    })
     Meteor.startup(function () {
         Meteor.methods({
             syncIssues: function (state) {
