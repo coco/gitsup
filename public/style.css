@@ -7,7 +7,7 @@ body {
 h1 {
   text-align: center;
   margin: 0;
-  line-height: 50px;
+  line-height: 80px;
   font-size: 24px;
 }
 hr {
@@ -35,7 +35,7 @@ p {
 header {
   background: #ff6600;
   overflow: hidden;
-  min-height: 50px;
+  min-height: 80px;
   line-height: 54px;
 }
 ol {

@@ -16,33 +16,26 @@ if (Meteor.isClient) {
 
     Meteor.call('syncIssues', state)
 
-    Session.setDefault('itemsLimit', 100)
-
-    Meteor.subscribe('issues', state, Session.get('itemsLimit'))
-
     Template.issues.helpers({
         items: function() {
-            return Issues.find({})
+            return Issues.find({
+                userName:state.userName,
+                projectName:state.projectName
+            },{
+                sort:{ votes: -1, comments: -1 }
+            })
         }
     })
 
-    setInterval(function() {
+    window.loaderInterval = setInterval(function() {
         if($('ol li').length) {
+            clearInterval(window.loaderInterval)
             $('#loader').remove()
         }
-    }, 500)
+    }, 100)
 }
 
 if (Meteor.isServer) {
-    Meteor.publish('issues', function(state, limit) {
-        return Issues.find({
-            userName:state.userName,
-            projectName:state.projectName
-        },{
-            sort:{ votes: -1, comments: -1 },
-            limit: limit
-        })
-    })
     Meteor.startup(function () {
         Meteor.methods({
             syncIssues: function (state) {
@@ -93,25 +86,29 @@ if (Meteor.isServer) {
                         for(var i = 0; i < issues.length; i++) {
 
                             var issue = issues[i]
+                            
+                            var votes = issue.reactions['+1']
 
-                            var item = {
-                                id: issue.id,
-                                userName: userName,
-                                projectName: projectName,
-                                votes: issue.reactions['+1'],
-                                title: issue.title,
-                                number: issue.number,
-                                state: issue.state,
-                                comments: issue.comments,
-                                html_url: issue.html_url
-                            }
+                            if(votes > 0) {
+                                var item = {
+                                    id: issue.id,
+                                    userName: userName,
+                                    projectName: projectName,
+                                    votes: votes,
+                                    title: issue.title,
+                                    number: issue.number,
+                                    state: issue.state,
+                                    comments: issue.comments,
+                                    html_url: issue.html_url
+                                }
 
-                            var existingIssue = Issues.find({id: issue.id, userName: userName, projectName: projectName}).fetch()[0]
+                                var existingIssue = Issues.find({id: issue.id, userName: userName, projectName: projectName}).fetch()[0]
 
-                            if(typeof existingIssue != 'undefined') {
-                                Issues.update({id: issue.id, userName: userName, projectName: projectName}, {$set: item})
-                            } else {
-                                Issues.insert(item)
+                                if(typeof existingIssue != 'undefined') {
+                                    Issues.update({id: issue.id, userName: userName, projectName: projectName}, {$set: item})
+                                } else {
+                                    Issues.insert(item)
+                                }
                             }
                         }
 
