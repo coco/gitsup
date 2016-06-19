@@ -39,15 +39,13 @@ header {
   line-height: 54px;
 }
 ol {
-  list-style-type: none;
   overflow: hidden;
   margin: 0;
-  padding: 0;
+  padding: 0 20px;
   font-size: 14px;
 }
 ol li {
   margin: 0 0 15px 0;
-  list-style-type: none;
   font-size: 15px;
 }
 #loader {

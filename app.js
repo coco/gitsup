@@ -22,7 +22,7 @@ if (Meteor.isClient) {
                 userName:state.userName,
                 projectName:state.projectName
             },{
-                sort:{ votes: -1, comments: -1 }
+                sort:{ points: -1, comments: -1 }
             })
         }
     })
@@ -86,18 +86,17 @@ if (Meteor.isServer) {
                         for(var i = 0; i < issues.length; i++) {
 
                             var issue = issues[i]
-                            
-                            var votes = issue.reactions['+1']
 
-                            if(votes > 0) {
+                            if(issue.reactions['+1'] != 0 || issue.reactions['-1'] != 0) {
                                 var item = {
                                     id: issue.id,
                                     userName: userName,
                                     projectName: projectName,
-                                    votes: votes,
+                                    points: issue.reactions['+1'] - issue.reactions['-1'],
                                     title: issue.title,
                                     number: issue.number,
                                     state: issue.state,
+                                    reactions: issue.reactions,
                                     comments: issue.comments,
                                     html_url: issue.html_url
                                 }
