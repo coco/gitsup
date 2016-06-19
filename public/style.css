@@ -10,6 +10,10 @@ h1 {
   line-height: 80px;
   font-size: 24px;
 }
+h1 a,
+h1 a:visited {
+  color: #1d1d1d;
+}
 hr {
   margin: 0 0 20px 0;
 }
@@ -30,7 +34,7 @@ p {
   padding: 3px;
 }
 .page {
-  padding: 25px;
+  padding: 20px;
 }
 .page > * {
   padding-top: 0;

@@ -14,6 +14,11 @@ if (Meteor.isClient) {
         projectName: projectName
     }
 
+    //DOM ready stuff
+    $(function() {
+        $('h1').html('<a href="https://github.com/'+userName+'/'+projectName+'">'+userName+'/'+projectName+'</a>')
+    })
+
     Meteor.call('syncIssues', state)
 
     Template.issues.helpers({
